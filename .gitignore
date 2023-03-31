@@ -1,0 +1,46 @@
+# build artifacts
+bin/
+obj/
+
+# Visual Studio files
+.vs/
+*.user
+*.suo
+*.sln.docstates
+*.dll.config
+
+# ASP.NET Core runtime store
+__app/
+
+# NuGet packages
+*.nuget.props
+*.nuget.targets
+project.lock.json
+packages/
+*.nupkg
+*.snupkg
+
+# MSTest test Results
+TestResults/
+
+# StyleCop
+StyleCopReport.xml
+
+# Resharper
+_ReSharper*/
+
+# Rider
+.idea*/
+*.sln.iml
+
+# Windows Azure Build Output
+csx/
+*.build.csdef
+
+# Build output
+[Dd]ebug/
+[Rr]elease/
+x64/
+build/
+[Bb]in/
+[Oo]bj/
