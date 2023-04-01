@@ -1,4 +1,6 @@
 ﻿using Dapper;
+using DependencyInjection.Entities;
+using DependencyInjection.Repositories.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using RestSharp;
@@ -8,26 +10,26 @@ namespace DependencyInjection.Controllers
     [ApiController]
     public class BookController : ControllerBase
     {
+        private readonly ICustomerRepository _customerRepository;
+        private readonly IBookRoomRepository _bookRoomRepository;
+
+        public BookController(
+            ICustomerRepository customerRepository, 
+            IBookRoomRepository bookRoomRepository)
+        {
+            _customerRepository = customerRepository;
+            _bookRoomRepository = bookRoomRepository;
+        }
         public async Task<IActionResult> Book(BookRoomCommand command)
         {
             // Recupera o usuário
-            await using var connection = new SqlConnection();
-            var customer = await connection
-                   .QueryFirstOrDefaultAsync<Customer>("SELECT * FROM [Customer] WHERE [Email] = @email",
-                   new { command.Email });
+            var customer = _customerRepository.GetCustomerAsync(command);
 
-            if(customer == null) 
+            if (customer == null) 
                 return NotFound();
 
             // Verifica se a sala está disponível 
-            var room = await connection.QueryFirstOrDefaultAsync<Book>(
-                "SELECT * FROM [Book] WHERE [Room] = @room AND [Date] BETWEEN @dateStart AND @dateEnd",
-                new
-                {
-                    Room = command.RoomId,
-                    DateStart = command.Day.Date,
-                    DateEnd = command.Day.Date.AddDays(1).AddTicks(-1)
-                });
+            var room = await _bookRoomRepository.GetRoomCommandAsync(command);
 
             // Se existe uma reserva, a sala está indisponível
             if (room is not null)
@@ -67,17 +69,5 @@ namespace DependencyInjection.Controllers
 
     }
 
-    public class BookRoomCommand
-        {
-            public string Email { get; set; }
-            public Guid RoomId { get; set; }
-            public DateTime Day { get; set; }
-            public CreditCard? CreditCard { get; set; }
-        }      
-
-        public record PaymentResponse(int Code, string Status);
-        public record Customer (string Email);
-        public record Room (Guid Id, string Name);
-        public record Book(string Email, Guid Room, DateTime Date);
-        public record CreditCard(string Name, string Holder, string Expiration, string Cvv);
+    
     }
