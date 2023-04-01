@@ -1,26 +1,19 @@
-using DependencyInjection.Repositories;
-using DependencyInjection.Repositories.Contracts;
-using DependencyInjection.Services;
-using DependencyInjection.Services.Contracts;
-using Microsoft.Data.SqlClient;
-using RestSharp;
+using DependencyInjection;
 
-var builder = WebApplication.CreateBuilder(args);
+namespace DependencyInjection
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            CreateHostBuilder(args).Build().Run();
+        }
 
-builder.Services.AddControllers();
-
-builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
-builder.Services.AddScoped<IBookRoomRepository, BookRoomRepository>();
-builder.Services.AddScoped<IPaymentService, PaymentService>();
-builder.Services.AddScoped<RestClient>();
-builder.Services.AddScoped<RestRequest>();
-builder.Services.AddScoped<SqlConnection>();
-
-var app = builder.Build();
-
-app.UseHttpsRedirection();
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                });
+    }
+}

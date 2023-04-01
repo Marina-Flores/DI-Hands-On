@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace DependencyInjection.Controllers
 {
     [ApiController]
+    [Route("api/[controller]")]
     public class BookController : ControllerBase
     {
         private readonly ICustomerRepository _customerRepository;
