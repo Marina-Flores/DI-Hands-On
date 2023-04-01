@@ -21,5 +21,17 @@ namespace DependencyInjection.Repositories
                     DateEnd = command.Day.Date.AddDays(1).AddTicks(-1)
                 });
         }
+
+        public async Task<Guid> InsertBookAsync(Book book)
+        {
+            await _connection.ExecuteAsync("INSERT INTO [Book] VALUES (@date, @email, @room)", new
+            {
+                book.Date,
+                book.Email,
+                book.Room
+            });
+
+            return book.Room;
+        }
     }
 }
