@@ -1,10 +1,8 @@
-﻿using Dapper;
+﻿using DependencyInjection.Attributes;
 using DependencyInjection.Entities;
 using DependencyInjection.Repositories.Contracts;
 using DependencyInjection.Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
-using RestSharp;
 
 namespace DependencyInjection.Controllers
 {
@@ -14,15 +12,23 @@ namespace DependencyInjection.Controllers
         private readonly ICustomerRepository _customerRepository;
         private readonly IBookRoomRepository _bookRoomRepository;
         private readonly IPaymentService _paymentService;
+        private readonly IConfiguration _configuration;
+
         public BookController(
+            IConfiguration configuration,
             ICustomerRepository customerRepository, 
             IBookRoomRepository bookRoomRepository,
-            IPaymentService paymentService)
+            IPaymentService paymentService
+            )
         {
+            _configuration = configuration;
             _customerRepository = customerRepository;
             _bookRoomRepository = bookRoomRepository;
-            _paymentService = paymentService;
+            _paymentService = paymentService;           
         }
+
+       [HttpPost]
+       [ApiKey]
         public async Task<IActionResult> Book(BookRoomCommand command)
         {
             var customer = _customerRepository.GetCustomerAsync(command);

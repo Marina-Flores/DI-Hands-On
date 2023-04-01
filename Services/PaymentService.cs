@@ -6,18 +6,25 @@ namespace DependencyInjection.Services
 {
     public class PaymentService : IPaymentService
     {
+        private readonly IConfiguration _configuration;
         private readonly RestClient _client;
         private readonly RestRequest _request;
 
-        public PaymentService(RestClient client, RestRequest request) 
+        public PaymentService(
+            IConfiguration configuration,
+            RestClient client, 
+            RestRequest request) 
         {
+            _configuration = configuration;
             _client = client;   
             _request = request;
         }
         public async Task<RestResponse> ProcessPayment(BookRoomCommand command)
         {
+            var apiKeyName = "PaymentApiKey";
+
             var request = _request
-                    .AddQueryParameter("api_key", "c20c8acb-bd76-4597-ac89-10fd955ac60d")
+                    .AddQueryParameter(apiKeyName, _configuration.GetValue<string>(apiKeyName))
                     .AddJsonBody(new
                     {
                         User = command.Email,
@@ -25,7 +32,6 @@ namespace DependencyInjection.Services
                     });
 
             return await _client.PostAsync(request, new CancellationToken());
-
         }
     }
 }
